@@ -1,0 +1,15 @@
+{
+    "name": "Stable Diffusion 1.4",
+    "category": "Computer Vision",
+    "example_input": {
+        "prompt": "A bunch of bananas",
+        "height": 512,
+        "width": 512,
+        "steps": 50,
+        "guidance_scale": 9,
+        "seed": null
+    },
+    "example_output": {
+        "image_base64": "<BASE64_STRING>"
+    },
+}
