@@ -1,26 +1,23 @@
 import torch
 from torch import autocast
-from diffusers import DiffusionPipeline, DPMSolverMultistepScheduler
+from kandinsky2 import get_kandinsky2
 import base64
 from io import BytesIO
 import os
 
 def init():
     global model
-    HF_AUTH_TOKEN = os.getenv("HF_AUTH_TOKEN")
-    repo = 'SdValar/deliberate2'
-    scheduler = DPMSolverMultistepScheduler.from_pretrained(repo, subfolder="scheduler")
-    model = DiffusionPipeline.from_pretrained(repo, scheduler=scheduler, use_auth_token=HF_AUTH_TOKEN, safety_checker=None).to("cuda")    
-
+    model = get_kandinsky2('cuda', task_type='text2img', cache_dir='/tmp/kandinsky2', model_version='2.1', use_flash_attention=False)
+                           
 def inference(model_inputs:dict):
     global model
 
     prompt = model_inputs.get('prompt', None)
-    negative = model_inputs.get('negative', None)
-    height = model_inputs.get('height', 512)
-    width = model_inputs.get('width', 512)
-    steps = model_inputs.get('steps', 50)
-    guidance_scale = model_inputs.get('guidance_scale', 9)
+    steps = model_inputs.get('steps', 100)
+    batch_size = model_inputs.get('batch_size', 1)
+    guidance_scale = model_inputs.get('guidance_scale', 4)
+    height = model_inputs.get('height', 768)
+    width = model_inputs.get('width', 768)
     seed = model_inputs.get('seed', None)
 
     if not prompt: return {'message': 'No prompt was provided'}
@@ -29,7 +26,18 @@ def inference(model_inputs:dict):
     if seed: generator = torch.Generator("cuda").manual_seed(seed)
     
     with autocast("cuda"):
-        image = model(prompt, negative_prompt=negative, guidance_scale=guidance_scale, height=height, width=width, num_inference_steps=steps, generator=generator).images[0]
+        images = model.generate_text2img(
+            prompt,
+            num_steps=steps,
+            batch_size=batch_size,
+            guidance_scale=guidance_scale,
+            h=height,
+            w=width,
+            sampler='p_sampler',
+            prior_cf_scale=4,
+            prior_steps="5"
+        )
+        image = images[0]
     
     buffered = BytesIO()
     image.save(buffered, format="JPEG")
