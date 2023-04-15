@@ -1,7 +1,6 @@
 sanic==22.6.2
 torch
 diffusers[torch]
-git+https://github.com/huggingface/transformers.git
 websockets==10.0
 git+https://github.com/ai-forever/Kandinsky-2.git#egg=kandinsky2
 git+https://github.com/openai/CLIP.git#egg=clip
