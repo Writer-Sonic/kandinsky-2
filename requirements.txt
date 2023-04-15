@@ -2,5 +2,6 @@ sanic==22.6.2
 torch
 diffusers[torch]
 websockets==10.0
+opencv-python==4.7.0.72
 git+https://github.com/ai-forever/Kandinsky-2.git#egg=kandinsky2
 git+https://github.com/openai/CLIP.git#egg=clip
