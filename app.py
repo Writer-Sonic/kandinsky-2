@@ -7,7 +7,7 @@ import os
 
 def init():
     global model
-    device = 0 if torch.cuda.is_available() else -1
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
     model = get_kandinsky2(device, task_type='text2img', cache_dir='/tmp/kandinsky2', model_version='2.1', use_flash_attention=False)
                            
 def inference(model_inputs:dict):
